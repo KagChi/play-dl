@@ -242,7 +242,7 @@
         "affectsGlobalScope": false
       },
       "../play-dl/youtube/utils/extractor.ts": {
-        "version": "83e8afc72d39b2a97fecfa3e31285aaf38e8e59fd2b22438ead94f51e3bfa75e",
+        "version": "bdf88f7b3edf36f6aebfe2d32062339e2e6f992a34c030199c15f7f5da2f3b04",
         "signature": "af69b225790ebd19d2ad410ae16541a975416dbef1c7476360c13864b254a3d5",
         "affectsGlobalScope": false
       },

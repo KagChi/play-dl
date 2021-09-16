@@ -51,7 +51,7 @@ function extractID(url) {
 }
 exports.extractID = extractID;
 async function video_basic_info(url, cookie) {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     let video_id;
     if (url.startsWith('https')) {
         if (yt_validate(url) !== 'video')
@@ -67,24 +67,24 @@ async function video_basic_info(url, cookie) {
     let { data: dataJson } = await axios_1.default.post('https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8', {
         "context": {
             "client": {
-                "hl": "en",
-                "gl": "ID",
-                "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36,gzip(gfe)",
-                "clientName": "WEB",
-                "clientVersion": "2.20210913.01.00"
+                "clientName": "ANDROID",
+                "clientVersion": "16.24"
             }
         },
         "videoId": video_id,
-        "params": "QAFIAQ%3D%3D",
-        "racyCheckOk": false,
-        "contentCheckOk": false
+        "playbackContext": {
+            "contentPlaybackContext": {
+                "signatureTimestamp": 1
+            }
+        }
     });
+    console.log(dataJson);
     if (dataJson.playabilityStatus.status !== 'OK')
         throw new Error(`While getting info from url\n${(_b = (_a = dataJson.playabilityStatus.errorScreen.playerErrorMessageRenderer) === null || _a === void 0 ? void 0 : _a.reason.simpleText) !== null && _b !== void 0 ? _b : (_c = dataJson.playabilityStatus.errorScreen.playerKavRenderer) === null || _c === void 0 ? void 0 : _c.reason.simpleText}`);
     let html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
     let format = [];
     let vid = dataJson.videoDetails;
-    let microformat = dataJson.microformat.playerMicroformatRenderer;
+    let microformat = (_d = dataJson.microformat) === null || _d === void 0 ? void 0 : _d.playerMicroformatRenderer;
     let video_details = {
         id: vid.videoId,
         url: `https://www.youtube.com/watch?v=${vid.videoId}`,
@@ -92,7 +92,7 @@ async function video_basic_info(url, cookie) {
         description: vid.shortDescription,
         durationInSec: vid.lengthSeconds,
         durationRaw: parseSeconds(vid.lengthSeconds),
-        uploadedDate: microformat.publishDate,
+        uploadedDate: microformat === null || microformat === void 0 ? void 0 : microformat.publishDate,
         thumbnail: vid.thumbnail.thumbnails[vid.thumbnail.thumbnails.length - 1],
         channel: {
             name: vid.author,
@@ -111,8 +111,8 @@ async function video_basic_info(url, cookie) {
     format.push(...dataJson.streamingData.adaptiveFormats);
     let LiveStreamData = {
         isLive: video_details.live,
-        dashManifestUrl: (_e = (_d = dataJson.streamingData) === null || _d === void 0 ? void 0 : _d.dashManifestUrl) !== null && _e !== void 0 ? _e : null,
-        hlsManifestUrl: (_g = (_f = dataJson.streamingData) === null || _f === void 0 ? void 0 : _f.hlsManifestUrl) !== null && _g !== void 0 ? _g : null
+        dashManifestUrl: (_f = (_e = dataJson.streamingData) === null || _e === void 0 ? void 0 : _e.dashManifestUrl) !== null && _f !== void 0 ? _f : null,
+        hlsManifestUrl: (_h = (_g = dataJson.streamingData) === null || _g === void 0 ? void 0 : _g.hlsManifestUrl) !== null && _h !== void 0 ? _h : null
     };
     return {
         LiveStreamData,

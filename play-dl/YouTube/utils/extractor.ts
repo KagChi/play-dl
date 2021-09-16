@@ -53,23 +53,23 @@ export async function video_basic_info(url : string, cookie? : string){
         let { data: dataJson } = await axios.post('https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8', {
             "context": {
                 "client": {
-                    "hl": "en",
-                    "gl": "ID",
-                    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36,gzip(gfe)",
-                    "clientName": "WEB",
-                    "clientVersion": "2.20210913.01.00"
+                    "clientName": "ANDROID",
+                    "clientVersion": "16.24"
                 }
             },
             "videoId": video_id,
-            "params": "QAFIAQ%3D%3D",
-            "racyCheckOk": false,
-            "contentCheckOk": false
+            "playbackContext": {
+                "contentPlaybackContext": {
+                    "signatureTimestamp": 1
+                }
+            }
         });
+    console.log(dataJson)
         if(dataJson.playabilityStatus.status !== 'OK') throw new Error(`While getting info from url\n${dataJson.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ?? dataJson.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText}`)
         let html5player =  `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`
         let format = []
         let vid = dataJson.videoDetails
-        let microformat = dataJson.microformat.playerMicroformatRenderer
+        let microformat = dataJson.microformat?.playerMicroformatRenderer
         let video_details = {
             id : vid.videoId,
             url : `https://www.youtube.com/watch?v=${vid.videoId}`,
@@ -77,7 +77,7 @@ export async function video_basic_info(url : string, cookie? : string){
             description : vid.shortDescription,
             durationInSec : vid.lengthSeconds,
             durationRaw : parseSeconds(vid.lengthSeconds),
-            uploadedDate : microformat.publishDate,
+            uploadedDate : microformat?.publishDate,
             thumbnail : vid.thumbnail.thumbnails[vid.thumbnail.thumbnails.length - 1],
             channel : {
                 name : vid.author,
