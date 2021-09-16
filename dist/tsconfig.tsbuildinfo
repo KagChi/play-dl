@@ -236,14 +236,9 @@
         "signature": "3154a026075044aa102298fe9e6a7a14aaa26a06270680c7478a1765af8ffb09",
         "affectsGlobalScope": false
       },
-      "../play-dl/youtube/utils/cipher.ts": {
-        "version": "6e91dab400525455afc5997a10b8436b2c56aeb6926efd92ea62c571fb710127",
-        "signature": "9f4e7ee7e679bf289e6111771a98434071f6efe6c84ecf706fd75d8d835e3ee8",
-        "affectsGlobalScope": false
-      },
       "../play-dl/youtube/utils/extractor.ts": {
-        "version": "bdf88f7b3edf36f6aebfe2d32062339e2e6f992a34c030199c15f7f5da2f3b04",
-        "signature": "af69b225790ebd19d2ad410ae16541a975416dbef1c7476360c13864b254a3d5",
+        "version": "f8e9b6b9d6817edeab63f514e2aca3637442e7f49caacfa9308898ab5813e9dd",
+        "signature": "155baf95d9f28105e3b8a527545f9ef977af095f1f968c64589aa6d942bc0816",
         "affectsGlobalScope": false
       },
       "../play-dl/youtube/classes/playlist.ts": {
@@ -294,6 +289,11 @@
       "../play-dl/index.ts": {
         "version": "009762677c34020972c7a9412a7a4c7e30660fbb74a3ba371afee70f825b453d",
         "signature": "d95d15a4b63032757622c0b0b0ea7d41661d54bebd044a40042c0336278c5da0",
+        "affectsGlobalScope": false
+      },
+      "../play-dl/youtube/utils/cipher.ts": {
+        "version": "6e91dab400525455afc5997a10b8436b2c56aeb6926efd92ea62c571fb710127",
+        "signature": "9f4e7ee7e679bf289e6111771a98434071f6efe6c84ecf706fd75d8d835e3ee8",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/node/assert.d.ts": {
@@ -1105,7 +1105,6 @@
         "../node_modules/axios/index.d.ts",
         "../play-dl/youtube/classes/playlist.ts",
         "../play-dl/youtube/classes/video.ts",
-        "../play-dl/youtube/utils/cipher.ts",
         "../play-dl/youtube/utils/request.ts"
       ],
       "../play-dl/youtube/utils/index.ts": [

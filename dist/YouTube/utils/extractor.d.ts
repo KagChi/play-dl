@@ -8,7 +8,6 @@ export declare function video_basic_info(url: string, cookie?: string): Promise<
         dashManifestUrl: any;
         hlsManifestUrl: any;
     };
-    html5player: string;
     format: any[];
     video_details: {
         id: any;
@@ -38,7 +37,6 @@ export declare function video_info(url: string, cookie?: string): Promise<{
         dashManifestUrl: any;
         hlsManifestUrl: any;
     };
-    html5player: string;
     format: any[];
     video_details: {
         id: any;

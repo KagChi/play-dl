@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getContinuationToken = exports.getPlaylistVideos = exports.playlist_info = exports.video_info = exports.video_basic_info = exports.extractID = exports.yt_validate = void 0;
 const request_1 = require("./request");
 const axios_1 = __importDefault(require("axios"));
-const cipher_1 = require("./cipher");
 const Video_1 = require("../classes/Video");
 const Playlist_1 = require("../classes/Playlist");
 const DEFAULT_API_KEY = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
@@ -60,10 +59,6 @@ async function video_basic_info(url, cookie) {
     }
     else
         video_id = url;
-    let new_url = `https://www.youtube.com/watch?v=${video_id}`;
-    let body = await request_1.request(new_url, {
-        headers: (cookie) ? { 'cookie': cookie, 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' } : { 'accept-language': 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' }
-    });
     let { data: dataJson } = await axios_1.default.post('https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8', {
         "context": {
             "client": {
@@ -78,10 +73,8 @@ async function video_basic_info(url, cookie) {
             }
         }
     });
-    console.log(dataJson);
     if (dataJson.playabilityStatus.status !== 'OK')
         throw new Error(`While getting info from url\n${(_b = (_a = dataJson.playabilityStatus.errorScreen.playerErrorMessageRenderer) === null || _a === void 0 ? void 0 : _a.reason.simpleText) !== null && _b !== void 0 ? _b : (_c = dataJson.playabilityStatus.errorScreen.playerKavRenderer) === null || _c === void 0 ? void 0 : _c.reason.simpleText}`);
-    let html5player = `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`;
     let format = [];
     let vid = dataJson.videoDetails;
     let microformat = (_d = dataJson.microformat) === null || _d === void 0 ? void 0 : _d.playerMicroformatRenderer;
@@ -116,7 +109,6 @@ async function video_basic_info(url, cookie) {
     };
     return {
         LiveStreamData,
-        html5player,
         format,
         video_details
     };
@@ -135,10 +127,6 @@ function parseSeconds(seconds) {
 async function video_info(url, cookie) {
     let data = await video_basic_info(url, cookie);
     if (data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null) {
-        return data;
-    }
-    else if (data.format[0].signatureCipher || data.format[0].cipher) {
-        data.format = await cipher_1.format_decipher(data.format, data.html5player);
         return data;
     }
     else {

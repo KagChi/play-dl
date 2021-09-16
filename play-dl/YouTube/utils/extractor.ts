@@ -1,6 +1,5 @@
 import { request } from './request';
 import axios from 'axios';
-import { format_decipher, js_tokens } from './cipher'
 import { Video } from '../classes/Video'
 import { PlayList } from '../classes/Playlist'
 
@@ -46,10 +45,6 @@ export async function video_basic_info(url : string, cookie? : string){
             video_id = extractID(url)
         }
         else video_id = url
-        let new_url = `https://www.youtube.com/watch?v=${video_id}`
-        let body = await request(new_url, {
-            headers : (cookie) ? { 'cookie' : cookie, 'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' } : {'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'}
-        })
         let { data: dataJson } = await axios.post('https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8', {
             "context": {
                 "client": {
@@ -64,9 +59,7 @@ export async function video_basic_info(url : string, cookie? : string){
                 }
             }
         });
-    console.log(dataJson)
         if(dataJson.playabilityStatus.status !== 'OK') throw new Error(`While getting info from url\n${dataJson.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ?? dataJson.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText}`)
-        let html5player =  `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`
         let format = []
         let vid = dataJson.videoDetails
         let microformat = dataJson.microformat?.playerMicroformatRenderer
@@ -100,7 +93,6 @@ export async function video_basic_info(url : string, cookie? : string){
         }
         return {
             LiveStreamData,
-            html5player,
             format,
             video_details
         }
@@ -123,10 +115,6 @@ export async function video_info(url : string, cookie? : string) {
     if(data.LiveStreamData.isLive === true && data.LiveStreamData.hlsManifestUrl !== null){
         return data
     }
-    else if(data.format[0].signatureCipher || data.format[0].cipher){
-        data.format = await format_decipher(data.format, data.html5player)
-        return data
-    } 
     else {
         return data
     }
