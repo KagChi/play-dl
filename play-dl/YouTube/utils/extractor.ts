@@ -1,4 +1,5 @@
-import { request } from './request'
+import { request } from './request';
+import axios from 'axios';
 import { format_decipher, js_tokens } from './cipher'
 import { Video } from '../classes/Video'
 import { PlayList } from '../classes/Playlist'
@@ -49,14 +50,26 @@ export async function video_basic_info(url : string, cookie? : string){
         let body = await request(new_url, {
             headers : (cookie) ? { 'cookie' : cookie, 'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7' } : {'accept-language' : 'en-US,en-IN;q=0.9,en;q=0.8,hi;q=0.7'}
         })
-        let player_response = JSON.parse(body.split("var ytInitialPlayerResponse = ")[1].split("}};")[0] + '}}')
-        let initial_response = JSON.parse(body.split("var ytInitialData = ")[1].split("}};")[0] + '}}')
-        let badge = initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer?.badges && initial_response.contents.twoColumnWatchNextResults.results.results.contents[1]?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer?.badges[0]
-        if(player_response.playabilityStatus.status !== 'OK') throw new Error(`While getting info from url\n${player_response.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ?? player_response.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText}`)
+        let { data: dataJson } = await axios.post('https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8', {
+            "context": {
+                "client": {
+                    "hl": "en",
+                    "gl": "ID",
+                    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36,gzip(gfe)",
+                    "clientName": "WEB",
+                    "clientVersion": "2.20210913.01.00"
+                }
+            },
+            "videoId": video_id,
+            "params": "QAFIAQ%3D%3D",
+            "racyCheckOk": false,
+            "contentCheckOk": false
+        });
+        if(dataJson.playabilityStatus.status !== 'OK') throw new Error(`While getting info from url\n${dataJson.playabilityStatus.errorScreen.playerErrorMessageRenderer?.reason.simpleText ?? dataJson.playabilityStatus.errorScreen.playerKavRenderer?.reason.simpleText}`)
         let html5player =  `https://www.youtube.com${body.split('"jsUrl":"')[1].split('"')[0]}`
         let format = []
-        let vid = player_response.videoDetails
-        let microformat = player_response.microformat.playerMicroformatRenderer
+        let vid = dataJson.videoDetails
+        let microformat = dataJson.microformat.playerMicroformatRenderer
         let video_details = {
             id : vid.videoId,
             url : `https://www.youtube.com/watch?v=${vid.videoId}`,
@@ -70,7 +83,7 @@ export async function video_basic_info(url : string, cookie? : string){
                 name : vid.author,
                 id : vid.channelId,
                 url : `https://www.youtube.com/channel/${vid.channelId}`,
-                verified : Boolean(badge?.metadataBadgeRenderer?.style?.toLowerCase().includes('verified'))
+                verified: null
             },
             views : vid.viewCount,
             tags : vid.keywords,
@@ -78,12 +91,12 @@ export async function video_basic_info(url : string, cookie? : string){
             live : vid.isLiveContent,
             private : vid.isPrivate
         }
-        if(!video_details.live) format.push(player_response.streamingData.formats[0])
-        format.push(...player_response.streamingData.adaptiveFormats)
+        if(!video_details.live) format.push(dataJson.streamingData.formats[0])
+        format.push(...dataJson.streamingData.adaptiveFormats)
         let LiveStreamData = {
             isLive : video_details.live,
-            dashManifestUrl : player_response.streamingData?.dashManifestUrl ?? null,
-            hlsManifestUrl : player_response.streamingData?.hlsManifestUrl ?? null
+            dashManifestUrl: dataJson.streamingData?.dashManifestUrl ?? null,
+            hlsManifestUrl: dataJson.streamingData?.hlsManifestUrl ?? null
         }
         return {
             LiveStreamData,
